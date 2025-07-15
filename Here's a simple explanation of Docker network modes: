@@ -1,0 +1,150 @@
+🐳 For Linux:
+Bridge
+
+Default. Creates a private network.
+
+Containers can talk to each other and to the internet.
+
+Think: a local Wi-Fi router.
+
+Host
+
+Shares the host machine’s network.
+
+No network isolation.
+
+Think: container = same as host.
+
+Overlay
+
+Used for Docker Swarm (multi-host).
+
+Connects containers across multiple machines.
+
+Think: virtual network over the internet.
+
+IPvlan
+
+Gives each container a unique IP on the host’s network.
+
+Good for advanced setups.
+
+Think: container acts like a real device.
+
+MACvlan
+
+Assigns a MAC address to each container.
+
+Makes it look like a real device on the network.
+
+Think: each container = separate computer.
+
+None
+
+No network.
+
+Useful for isolated tasks.
+
+Think: completely offline.
+
+🪟 For Windows:
+NAT (Network Address Translation)
+
+Default. Containers share the host’s IP.
+
+Internet access via the host.
+
+Transparent
+
+Containers get real IPs from your LAN.
+
+Acts like normal PCs on the network.
+
+Overlay
+
+Same as Linux. Used in Swarm for multi-host.
+
+L2Bridge
+
+Connects containers like a switch.
+
+Allows VLAN tagging.
+
+L2Tunnel
+
+Like L2Bridge, but for containers on different networks.
+
+None
+
+No networking.
+
+On macOS, Docker runs inside a lightweight Linux VM (using Docker Desktop), so the networking options are more limited than on Linux or Windows Server.
+
+Here’s a simple summary of what’s available on macOS:
+
+🐳 Docker Network Modes on macOS:
+Bridge (default)
+
+Containers get a private IP inside the VM.
+
+Can talk to each other.
+
+Can access the internet.
+
+Can't be reached directly from your Mac unless you publish ports.
+
+✅ Most commonly used.
+
+Host – ❌ Not available on macOS
+
+--network=host is not supported (because Docker runs in a VM).
+
+Overlay
+
+✅ Available in Docker Swarm mode.
+
+Connects containers across multiple machines.
+
+None
+
+No network.
+
+Useful for full isolation (like testing or security).
+
+Macvlan / IPvlan – ❌ Not supported on macOS
+
+These require direct access to host network interfaces, which the VM doesn’t have.
+
+Extra (macOS-specific):
+Docker Desktop on macOS uses a NAT-based bridge inside the VM.
+
+You can expose ports with -p, like:
+
+bash
+Копировать
+Редактировать
+docker run -d -p 8080:80 nginx
+Then access it via http://localhost:8080 on your Mac.
+
+Summary Table:
+Mode	Supported on macOS	Description
+Bridge	✅ Yes	Default; private network inside VM
+Host	❌ No	Not available on macOS
+Overlay	✅ Yes (Swarm)	For multi-host container networks
+None	✅ Yes	No networking
+Macvlan	❌ No	Not available due to VM isolation
+IPvlan	❌ No	Same as Macvlan
+
+Your Mac (host)
+│
+├── localhost:8080  ← You access this
+│
+└── Docker VM (Linux)
+     │
+     ├── Bridge Network (default)
+     │    ├── Container A (e.g., NGINX)
+     │    │     IP: 172.17.0.2
+     │    └── Container B (e.g., Redis)
+     │          IP: 172.17.0.3
+     │
+     └── Internet Access (NAT via VM)
